@@ -7,7 +7,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Modelos
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False)
@@ -28,7 +28,7 @@ class Sale(db.Model):
 @app.route('/product', methods=['GET', 'POST'])
 def product():
     if request.method == 'POST':
-        # Implementação para criar um produto
+        
         data = request.json
         name = data.get('name')
         stock = data.get('stock')
@@ -43,7 +43,7 @@ def product():
 
         return jsonify({"message": "Produto criado com sucesso!", "product_id": product.id}), 201
     else:
-        # Implementação para retornar todos os produtos
+       
         products = Product.query.all()
         return jsonify([{"id": p.id, "name": p.name, "stock": p.stock, "price": str(p.price)} for p in products]), 200
 
@@ -56,27 +56,27 @@ def sale():
         product_id = data.get('product_id')
         quantity = data.get('quantity')
 
-        # Verifica se o produto existe
+       
         product = Product.query.get(product_id)
         if not product:
             return jsonify({"message": "Produto não encontrado."}), 404
 
-        # Verifica se há estoque suficiente
+        
         if product.stock < quantity:
             return jsonify({"message": "Estoque insuficiente."}), 400
 
-        # Realiza a venda
+       
         sale_price = product.price * quantity
         sale = Sale(user_id=user_id, product_id=product_id, quantity=quantity, price=sale_price)
         db.session.add(sale)
 
-        # Atualiza o estoque do produto
+       
         product.stock -= quantity
         db.session.commit()
 
         return jsonify({"message": "Venda realizada com sucesso!", "sale_id": sale.id}), 201
     else:
-        # Implementação para retornar todas as vendas
+       
         sales = Sale.query.all()
         return jsonify([{"id": s.id, "user_id": s.user_id, "product_id": s.product_id, "quantity": s.quantity, "price": s.price} for s in sales]), 200
 
@@ -99,5 +99,5 @@ def test():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Cria as tabelas
+        db.create_all()  
     app.run(debug=True, port=5001)
